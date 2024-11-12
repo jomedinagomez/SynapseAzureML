@@ -910,7 +910,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "20adca27-0b8a-456f-a573-fd7a85b4cf14"
+						"spark.autotune.trackingId": "49ab50a8-ff5d-43e0-8cb2-30a776357b3a"
 					}
 				},
 				"metadata": {
@@ -935,8 +935,7 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56,
-						"automaticScaleJobs": false
+						"memory": 56
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -956,7 +955,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"# Importing pyspark dependencies\r\n",
 							"from pyspark.sql.types import IntegerType,BooleanType,DateType,NumericType,TimestampType\r\n",
@@ -1006,8 +1004,7 @@
 						},
 						"source": [
 							"# Read from existing internal table\r\n",
-							"df = (spark.read\r\n",
-							"                     .synapsesql(\"synapseazuremldedicates.dbo.class_transformed_taxi_data\")).drop('cost')\r\n",
+							"df = (spark.read.synapsesql(\"synapseazuremldedicates.dbo.class_transformed_taxi_data\")).drop('cost')\r\n",
 							"\r\n",
 							"# Show contents of the dataframe\r\n",
 							"display(df.head(5))"
@@ -1344,6 +1341,306 @@
 						],
 						"outputs": [],
 						"execution_count": 290
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/STEP3_Model_predict')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "synapseml",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "3eeeea61-4c7c-4efa-86e6-ee84ae6943e4"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/14585b9f-5c83-4a76-8055-42149123f99f/resourceGroups/SynapseMLrg/providers/Microsoft.Synapse/workspaces/synapsemlws/bigDataPools/synapseml",
+						"name": "synapseml",
+						"type": "Spark",
+						"endpoint": "https://synapsemlws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/synapseml",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 10,
+						"cores": 8,
+						"memory": 56,
+						"automaticScaleJobs": false
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## 3. Model scoring"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"# Importing pyspark dependencies\r\n",
+							"from pyspark.sql.types import IntegerType,BooleanType,DateType,NumericType,TimestampType\r\n",
+							"from pyspark.ml.feature import Binarizer, Bucketizer, QuantileDiscretizer\r\n",
+							"from com.microsoft.spark.sqlanalytics.Constants import Constants\r\n",
+							"import com.microsoft.spark.sqlanalytics\r\n",
+							"from pyspark.sql.functions import col\r\n",
+							"import pyspark.sql.functions as F\r\n",
+							"\r\n",
+							"# Importing mlflow libraries\r\n",
+							"from mlflow.models import infer_signature, set_signature\r\n",
+							"from mlflow.models.model import get_model_info\r\n",
+							"import mlflow\r\n",
+							"\r\n",
+							"\r\n",
+							"# Importing general libraries\r\n",
+							"from sklearn.metrics import accuracy_score, f1_score, precision_score, confusion_matrix, recall_score, roc_auc_score, classification_report\r\n",
+							"import pandas as pd\r\n",
+							"\r\n",
+							"#AML workspace authentication using linked service\r\n",
+							"from notebookutils.mssparkutils import azureML\r\n",
+							"linked_service_name = \"AzureMLService1\"\r\n",
+							"ws = azureML.getWorkspace(linked_service_name)\r\n",
+							"mlflow.set_tracking_uri(ws.get_mlflow_tracking_uri().replace(\"v2.0\",\"v1.0\"))\r\n",
+							"\r\n",
+							"## Importing SynapseML\r\n",
+							"from synapse.ml.featurize import Featurize\r\n",
+							"from synapse.ml.lightgbm import *\r\n",
+							"from synapse.ml.train import ComputeModelStatistics"
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### 3.1 Importing data"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"# Read from existing internal table\r\n",
+							"df = (spark.read.synapsesql(\"synapseazuremldedicates.dbo.class_transformed_taxi_data\")).drop('cost')\r\n",
+							"\r\n",
+							"# Show contents of the dataframe\r\n",
+							"display(df.head(5))"
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### 3.2  Testing model from run folder"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### --------------------------------------------------------------------------- ###\r\n",
+							"model_name = 'featurizer'\r\n",
+							"# Search registered models for the \r\n",
+							"for model in mlflow.search_registered_models():\r\n",
+							"    if model.name == model_name:\r\n",
+							"        latest_version_run_id = model.latest_versions[0].run_id\r\n",
+							"        model_found = True\r\n",
+							"        break\r\n",
+							"\r\n",
+							"# load model from Azure Machine Learning\r\n",
+							"run_id = latest_version_run_id\r\n",
+							"artifact_path = \"model\"\r\n",
+							"model_uri = f\"runs:/{run_id}/{artifact_path}\"\r\n",
+							"featurizer_model = mlflow.spark.load_model(model_uri)\r\n",
+							"\r\n",
+							"### --------------------------------------------------------------------------- ###\r\n",
+							"\r\n",
+							"model_name = 'classification_demo'\r\n",
+							"# Search registered models for the \r\n",
+							"for model in mlflow.search_registered_models():\r\n",
+							"    if model.name == model_name:\r\n",
+							"        latest_version_run_id = model.latest_versions[0].run_id\r\n",
+							"        model_found = True\r\n",
+							"        break\r\n",
+							"\r\n",
+							"# load model from Azure Machine Learning\r\n",
+							"run_id = latest_version_run_id\r\n",
+							"artifact_path = \"lightgbm_model\"\r\n",
+							"model_uri = f\"runs:/{run_id}/{artifact_path}\"\r\n",
+							"model = mlflow.pyfunc.load_model(model_uri)\r\n",
+							"\r\n",
+							"### --------------------------------------------------------------------------- ###\r\n",
+							"\r\n",
+							"df_trans = featurizer_model.transform(df)\r\n",
+							"pandas_df = df_trans.toPandas()\r\n",
+							"\r\n",
+							"# testing model\r\n",
+							"test_predictions = model.predict(pandas_df.head())\r\n",
+							"print(test_predictions)"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### 3.3 Testing model from model registry using pyfunc"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"model = mlflow.pyfunc.load_model(model_uri=f\"models:/classification_demo/latest\")\r\n",
+							"\r\n",
+							"test_predictions = model.predict(pandas_df)\r\n",
+							"print(test_predictions)"
+						],
+						"outputs": [],
+						"execution_count": 11
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### 3.4 Testing model from model registry using spark"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"spark_model = mlflow.spark.load_model(model_uri=f\"models:/classification_demo/latest\")\r\n",
+							"display(spark_model.transform(df_trans))"
+						],
+						"outputs": [],
+						"execution_count": 9
 					},
 					{
 						"cell_type": "code",
