@@ -168,7 +168,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "6701328d-5c2d-4a57-a8b9-e36913bd5ba0"
+						"spark.autotune.trackingId": "e35e0f93-a825-4863-b4bc-9674378cb051"
 					}
 				},
 				"metadata": {
@@ -233,7 +233,7 @@
 							"import pandas as pd"
 						],
 						"outputs": [],
-						"execution_count": 78
+						"execution_count": 25
 					},
 					{
 						"cell_type": "markdown",
@@ -284,7 +284,7 @@
 							"display(green_raw.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 79
+						"execution_count": 26
 					},
 					{
 						"cell_type": "code",
@@ -303,7 +303,7 @@
 						"source": [
 							"green_columns_remap =    {\r\n",
 							"        \"vendorID\": \"vendor\",\r\n",
-							"        \"lpepPickupDatetime\": \"\",\r\n",
+							"        \"lpepPickupDatetime\": \"pickup_datetime\",\r\n",
 							"        \"lpepDropoffDatetime\": \"dropoff_datetime\",\r\n",
 							"        \"storeAndFwdFlag\": \"store_forward\",\r\n",
 							"        \"pickupLongitude\": \"pickup_longitude\",\r\n",
@@ -320,7 +320,7 @@
 							"display(green_remapped.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 80
+						"execution_count": 27
 					},
 					{
 						"cell_type": "markdown",
@@ -358,7 +358,7 @@
 							"display(yellow_raw.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 81
+						"execution_count": 28
 					},
 					{
 						"cell_type": "code",
@@ -394,7 +394,7 @@
 							"display(yellow_remapped.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 82
+						"execution_count": 29
 					},
 					{
 						"cell_type": "markdown",
@@ -430,7 +430,7 @@
 							"print(\"Length of combined dataframes :\" , df_combined_taxi.count())"
 						],
 						"outputs": [],
-						"execution_count": 83
+						"execution_count": 30
 					},
 					{
 						"cell_type": "markdown",
@@ -462,7 +462,7 @@
 							"#https://learn.microsoft.com/en-us/azure/synapse-analytics/spark/synapse-spark-sql-pool-import-export?tabs=scala%2Cscala1%2Cscala2%2Cscala3%2Cscala4%2Cpython5#write-using-basic-authentication"
 						],
 						"outputs": [],
-						"execution_count": 84
+						"execution_count": 31
 					},
 					{
 						"cell_type": "code",
@@ -481,7 +481,7 @@
 							"df_combined_taxi.write.mode(\"overwrite\").synapsesql(\"synapseazuremldedicates.dbo.combined_taxi_data\")"
 						],
 						"outputs": [],
-						"execution_count": 85
+						"execution_count": 32
 					},
 					{
 						"cell_type": "markdown",
@@ -529,7 +529,7 @@
 							"display(df_combined_taxi.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 86
+						"execution_count": 33
 					},
 					{
 						"cell_type": "code",
@@ -558,7 +558,7 @@
 							"latlong_filtered_df.count()"
 						],
 						"outputs": [],
-						"execution_count": 111
+						"execution_count": 34
 					},
 					{
 						"cell_type": "markdown",
@@ -592,7 +592,7 @@
 							"display(latlong_filtered_df.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 112
+						"execution_count": 35
 					},
 					{
 						"cell_type": "code",
@@ -619,7 +619,7 @@
 							"display(normalized_df.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 113
+						"execution_count": 36
 					},
 					{
 						"cell_type": "markdown",
@@ -653,7 +653,7 @@
 							"display(normalized_df.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 114
+						"execution_count": 37
 					},
 					{
 						"cell_type": "code",
@@ -680,7 +680,7 @@
 							"display(normalized_df.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 115
+						"execution_count": 38
 					},
 					{
 						"cell_type": "markdown",
@@ -719,7 +719,7 @@
 							"normalized_df.groupBy(\"store_forward\").count().show()"
 						],
 						"outputs": [],
-						"execution_count": 116
+						"execution_count": 39
 					},
 					{
 						"cell_type": "markdown",
@@ -760,7 +760,7 @@
 							"print(final_df.count())"
 						],
 						"outputs": [],
-						"execution_count": 117
+						"execution_count": 40
 					},
 					{
 						"cell_type": "markdown",
@@ -792,7 +792,7 @@
 							"df_combined_taxi.write.mode(\"overwrite\").synapsesql(\"synapseazuremldedicates.dbo.reg_transformed_taxi_data\")"
 						],
 						"outputs": [],
-						"execution_count": 118
+						"execution_count": 41
 					},
 					{
 						"cell_type": "markdown",
@@ -826,7 +826,7 @@
 							"bucketed_df.groupBy(\"cost_class\").count().show()"
 						],
 						"outputs": [],
-						"execution_count": 119
+						"execution_count": 42
 					},
 					{
 						"cell_type": "code",
@@ -846,7 +846,7 @@
 							"display(bucketed_df.head(10))"
 						],
 						"outputs": [],
-						"execution_count": 120
+						"execution_count": 43
 					},
 					{
 						"cell_type": "code",
@@ -865,7 +865,222 @@
 							"bucketed_df.write.mode(\"overwrite\").synapsesql(\"synapseazuremldedicates.dbo.class_transformed_taxi_data\")"
 						],
 						"outputs": [],
-						"execution_count": 121
+						"execution_count": 44
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/STEP2_Model_Training')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "synapseml",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "17e0fd83-7d06-44a3-aaf5-57cca0e6c50a"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/14585b9f-5c83-4a76-8055-42149123f99f/resourceGroups/SynapseMLrg/providers/Microsoft.Synapse/workspaces/synapsemlws/bigDataPools/synapseml",
+						"name": "synapseml",
+						"type": "Spark",
+						"endpoint": "https://synapsemlws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/synapseml",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 10,
+						"cores": 8,
+						"memory": 56,
+						"automaticScaleJobs": false
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## 2. Model Training"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"# Importing pyspark dependencies\r\n",
+							"from pyspark.sql.types import IntegerType,BooleanType,DateType,NumericType,TimestampType\r\n",
+							"from pyspark.ml.feature import Binarizer, Bucketizer, QuantileDiscretizer\r\n",
+							"from pyspark.sql.functions import col\r\n",
+							"import pyspark.sql.functions as F\r\n",
+							"\r\n",
+							"# Importing mlflow libraries\r\n",
+							"from mlflow.models import infer_signature, set_signature\r\n",
+							"from mlflow.models.model import get_model_info\r\n",
+							"import mlflow\r\n",
+							"\r\n",
+							"# Importing general libraries\r\n",
+							"from sklearn.metrics import accuracy_score, f1_score, precision_score, confusion_matrix, recall_score, roc_auc_score, classification_report\r\n",
+							"import pandas as pd\r\n",
+							"\r\n",
+							"#AML workspace authentication using linked service\r\n",
+							"from notebookutils.mssparkutils import azureML\r\n",
+							"linked_service_name = \"AzureMLService1\"\r\n",
+							"ws = azureML.getWorkspace(linked_service_name)\r\n",
+							"mlflow.set_tracking_uri(ws.get_mlflow_tracking_uri())"
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Read from existing internal table\r\n",
+							"df = (spark.read\r\n",
+							"                     .synapsesql(\"synapseazuremldedicates.dbo.class_transformed_taxi_data\"))\r\n",
+							"\r\n",
+							"# Show contents of the dataframe\r\n",
+							"df(df.head(5))"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### 2.2 Split dataset in train/test using a stratified strategy"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Read from existing internal table\r\n",
+							"green_raw = (spark.read\r\n",
+							"                     .synapsesql(\"synapseazuremldedicates.dbo.greenTaxiData\"))\r\n",
+							"\r\n",
+							"# Show contents of the dataframe\r\n",
+							"display(green_raw.head(5))"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
 					}
 				]
 			},
