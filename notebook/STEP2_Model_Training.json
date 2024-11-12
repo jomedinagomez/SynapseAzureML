@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "88471221-2a9d-4104-a177-d42b11578923"
+				"spark.autotune.trackingId": "b8f70d52-4db3-4001-b08d-e9c0b6149d18"
 			}
 		},
 		"metadata": {
@@ -292,14 +292,40 @@
 					"model_uri = f\"runs:/{training.info.run_id}/lightgbm_model\"\r\n",
 					"mlflow.register_model(model_uri=model_uri, name=model_name)"
 				],
-				"execution_count": 276
+				"execution_count": 280
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### 2.4 Testing models"
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#### 2.4.1 Testing model from run folder"
+				]
 			},
 			{
 				"cell_type": "code",
 				"metadata": {
 					"jupyter": {
 						"source_hidden": false,
-						"outputs_hidden": true
+						"outputs_hidden": false
 					},
 					"nteract": {
 						"transient": {
@@ -345,9 +371,23 @@
 					"pandas_test_df = test_df_trans.toPandas()\r\n",
 					"\r\n",
 					"# testing model\r\n",
-					"test_predictions = model.predict(pandas_test_df)"
+					"test_predictions = model.predict(pandas_test_df.head())\r\n",
+					"print(test_predictions)"
 				],
-				"execution_count": 217
+				"execution_count": 288
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#### 2.4.2 Testing model from model registry using pyfunc"
+				]
 			},
 			{
 				"cell_type": "code",
@@ -365,9 +405,43 @@
 				"source": [
 					"model = mlflow.pyfunc.load_model(model_uri=f\"models:/classification_demo/latest\")\r\n",
 					"\r\n",
-					"test_predictions = model.predict(pandas_test_df)"
+					"test_predictions = model.predict(pandas_test_df.head())\r\n",
+					"print(test_predictions)"
 				],
-				"execution_count": 223
+				"execution_count": 289
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#### 2.4.3 Testing model from model registry using spark"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"spark_model = mlflow.spark.load_model(model_uri=f\"models:/classification_demo/latest\")\r\n",
+					"display(spark_model.transform(test_df_trans))"
+				],
+				"execution_count": 290
 			},
 			{
 				"cell_type": "code",
@@ -383,7 +457,7 @@
 					}
 				},
 				"source": [
-					"test_df_trans.toPandas()"
+					""
 				],
 				"execution_count": null
 			}
