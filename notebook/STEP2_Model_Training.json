@@ -1,0 +1,187 @@
+{
+	"name": "STEP2_Model_Training",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "synapseml",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "56g",
+			"driverCores": 8,
+			"executorMemory": "56g",
+			"executorCores": 8,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "cea55b86-45bf-4d60-8455-b3867a284a4b"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/14585b9f-5c83-4a76-8055-42149123f99f/resourceGroups/SynapseMLrg/providers/Microsoft.Synapse/workspaces/synapsemlws/bigDataPools/synapseml",
+				"name": "synapseml",
+				"type": "Spark",
+				"endpoint": "https://synapsemlws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/synapseml",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 10,
+				"cores": 8,
+				"memory": 56,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## 2. Model Training"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Importing pyspark dependencies\r\n",
+					"from pyspark.sql.types import IntegerType,BooleanType,DateType,NumericType,TimestampType\r\n",
+					"from pyspark.ml.feature import Binarizer, Bucketizer, QuantileDiscretizer\r\n",
+					"from pyspark.sql.functions import col\r\n",
+					"import pyspark.sql.functions as F\r\n",
+					"\r\n",
+					"# Importing mlflow libraries\r\n",
+					"from mlflow.models import infer_signature, set_signature\r\n",
+					"from mlflow.models.model import get_model_info\r\n",
+					"import mlflow\r\n",
+					"\r\n",
+					"# Importing general libraries\r\n",
+					"from sklearn.metrics import accuracy_score, f1_score, precision_score, confusion_matrix, recall_score, roc_auc_score, classification_report\r\n",
+					"import pandas as pd\r\n",
+					"\r\n",
+					"#AML workspace authentication using linked service\r\n",
+					"from notebookutils.mssparkutils import azureML\r\n",
+					"linked_service_name = \"AzureMLService1\"\r\n",
+					"ws = azureML.getWorkspace(linked_service_name)\r\n",
+					"mlflow.set_tracking_uri(ws.get_mlflow_tracking_uri())"
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Read from existing internal table\r\n",
+					"df = (spark.read\r\n",
+					"                     .synapsesql(\"synapseazuremldedicates.dbo.class_transformed_taxi_data\"))\r\n",
+					"\r\n",
+					"# Show contents of the dataframe\r\n",
+					"df(df.head(5))"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### 2.2 Split dataset in train/test using a stratified strategy"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Read from existing internal table\r\n",
+					"green_raw = (spark.read\r\n",
+					"                     .synapsesql(\"synapseazuremldedicates.dbo.greenTaxiData\"))\r\n",
+					"\r\n",
+					"# Show contents of the dataframe\r\n",
+					"display(green_raw.head(5))"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				],
+				"execution_count": null
+			}
+		]
+	}
+}
