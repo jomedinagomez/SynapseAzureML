@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b8f70d52-4db3-4001-b08d-e9c0b6149d18"
+				"spark.autotune.trackingId": "49ab50a8-ff5d-43e0-8cb2-30a776357b3a"
 			}
 		},
 		"metadata": {
@@ -111,8 +111,7 @@
 				},
 				"source": [
 					"# Read from existing internal table\r\n",
-					"df = (spark.read\r\n",
-					"                     .synapsesql(\"synapseazuremldedicates.dbo.class_transformed_taxi_data\")).drop('cost')\r\n",
+					"df = (spark.read.synapsesql(\"synapseazuremldedicates.dbo.class_transformed_taxi_data\")).drop('cost')\r\n",
 					"\r\n",
 					"# Show contents of the dataframe\r\n",
 					"display(df.head(5))"
