@@ -168,7 +168,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "d05ddc31-c0cf-4c64-a353-e94535902df5"
+						"spark.autotune.trackingId": "cef86749-8df0-44ea-a807-219722fe7753"
 					}
 				},
 				"metadata": {
@@ -233,7 +233,7 @@
 							"import pandas as pd"
 						],
 						"outputs": [],
-						"execution_count": 7
+						"execution_count": 57
 					},
 					{
 						"cell_type": "markdown",
@@ -284,7 +284,7 @@
 							"display(green_raw.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 9
+						"execution_count": 58
 					},
 					{
 						"cell_type": "code",
@@ -320,7 +320,7 @@
 							"display(green_remapped.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 11
+						"execution_count": 59
 					},
 					{
 						"cell_type": "markdown",
@@ -358,7 +358,7 @@
 							"display(yellow_raw.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 12
+						"execution_count": 60
 					},
 					{
 						"cell_type": "code",
@@ -394,7 +394,7 @@
 							"display(yellow_remapped.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 13
+						"execution_count": 61
 					},
 					{
 						"cell_type": "markdown",
@@ -430,7 +430,7 @@
 							"print(\"Length of combined dataframes :\" , df_combined_taxi.count())"
 						],
 						"outputs": [],
-						"execution_count": 14
+						"execution_count": 62
 					},
 					{
 						"cell_type": "markdown",
@@ -462,7 +462,7 @@
 							"#https://learn.microsoft.com/en-us/azure/synapse-analytics/spark/synapse-spark-sql-pool-import-export?tabs=scala%2Cscala1%2Cscala2%2Cscala3%2Cscala4%2Cpython5#write-using-basic-authentication"
 						],
 						"outputs": [],
-						"execution_count": 15
+						"execution_count": 63
 					},
 					{
 						"cell_type": "code",
@@ -481,7 +481,7 @@
 							"df_combined_taxi.write.mode(\"overwrite\").synapsesql(\"synapseazuremldedicates.dbo.combined_taxi_data\")"
 						],
 						"outputs": [],
-						"execution_count": 17
+						"execution_count": 64
 					},
 					{
 						"cell_type": "markdown",
@@ -529,7 +529,7 @@
 							"display(df_combined_taxi.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 18
+						"execution_count": 65
 					},
 					{
 						"cell_type": "code",
@@ -558,7 +558,7 @@
 							"latlong_filtered_df.count()"
 						],
 						"outputs": [],
-						"execution_count": 19
+						"execution_count": 66
 					},
 					{
 						"cell_type": "markdown",
@@ -584,6 +584,28 @@
 								"transient": {
 									"deleting": false
 								}
+							}
+						},
+						"source": [
+							"from pyspark.sql.functions import to_timestamp\r\n",
+							"df = spark.createDataFrame([('1997-02-28 10:30:00',)], ['t'])\r\n",
+							"df.select(to_timestamp(df.t, 'yyyy-MM-dd HH:mm:ss').alias('dt')).collect()\r\n",
+							"display(df)"
+						],
+						"outputs": [],
+						"execution_count": 76
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
 							},
 							"collapsed": false
 						},
@@ -592,7 +614,7 @@
 							"display(latlong_filtered_df.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 20
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -619,7 +641,7 @@
 							"display(normalized_df.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 21
+						"execution_count": 68
 					},
 					{
 						"cell_type": "markdown",
@@ -653,7 +675,7 @@
 							"display(normalized_df.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 22
+						"execution_count": 69
 					},
 					{
 						"cell_type": "code",
@@ -680,7 +702,7 @@
 							"display(normalized_df.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 23
+						"execution_count": 70
 					},
 					{
 						"cell_type": "markdown",
@@ -719,7 +741,7 @@
 							"normalized_df.groupBy(\"store_forward\").count().show()"
 						],
 						"outputs": [],
-						"execution_count": 24
+						"execution_count": 71
 					},
 					{
 						"cell_type": "markdown",
@@ -760,7 +782,7 @@
 							"print(final_df.count())"
 						],
 						"outputs": [],
-						"execution_count": 25
+						"execution_count": 72
 					},
 					{
 						"cell_type": "markdown",
@@ -792,7 +814,7 @@
 							"df_combined_taxi.write.mode(\"overwrite\").synapsesql(\"synapseazuremldedicates.dbo.reg_transformed_taxi_data\")"
 						],
 						"outputs": [],
-						"execution_count": 26
+						"execution_count": 73
 					},
 					{
 						"cell_type": "markdown",
@@ -826,7 +848,7 @@
 							"bucketed_df.groupBy(\"cost_class\").count().show()"
 						],
 						"outputs": [],
-						"execution_count": 27
+						"execution_count": 74
 					},
 					{
 						"cell_type": "code",
@@ -839,13 +861,14 @@
 								"transient": {
 									"deleting": false
 								}
-							}
+							},
+							"collapsed": false
 						},
 						"source": [
 							"display(bucketed_df.head(10))"
 						],
 						"outputs": [],
-						"execution_count": 28
+						"execution_count": 75
 					},
 					{
 						"cell_type": "code",
