@@ -168,7 +168,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "e35e0f93-a825-4863-b4bc-9674378cb051"
+						"spark.autotune.trackingId": "d0bfd9f8-d3c1-4d20-a130-85e81b578245"
 					}
 				},
 				"metadata": {
@@ -193,8 +193,7 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56,
-						"automaticScaleJobs": false
+						"memory": 56
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -233,7 +232,7 @@
 							"import pandas as pd"
 						],
 						"outputs": [],
-						"execution_count": 25
+						"execution_count": 45
 					},
 					{
 						"cell_type": "markdown",
@@ -284,7 +283,7 @@
 							"display(green_raw.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 26
+						"execution_count": 46
 					},
 					{
 						"cell_type": "code",
@@ -320,7 +319,7 @@
 							"display(green_remapped.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 27
+						"execution_count": 47
 					},
 					{
 						"cell_type": "markdown",
@@ -358,7 +357,7 @@
 							"display(yellow_raw.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 28
+						"execution_count": 48
 					},
 					{
 						"cell_type": "code",
@@ -394,7 +393,7 @@
 							"display(yellow_remapped.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 29
+						"execution_count": 49
 					},
 					{
 						"cell_type": "markdown",
@@ -430,7 +429,7 @@
 							"print(\"Length of combined dataframes :\" , df_combined_taxi.count())"
 						],
 						"outputs": [],
-						"execution_count": 30
+						"execution_count": 50
 					},
 					{
 						"cell_type": "markdown",
@@ -462,7 +461,7 @@
 							"#https://learn.microsoft.com/en-us/azure/synapse-analytics/spark/synapse-spark-sql-pool-import-export?tabs=scala%2Cscala1%2Cscala2%2Cscala3%2Cscala4%2Cpython5#write-using-basic-authentication"
 						],
 						"outputs": [],
-						"execution_count": 31
+						"execution_count": 51
 					},
 					{
 						"cell_type": "code",
@@ -481,7 +480,7 @@
 							"df_combined_taxi.write.mode(\"overwrite\").synapsesql(\"synapseazuremldedicates.dbo.combined_taxi_data\")"
 						],
 						"outputs": [],
-						"execution_count": 32
+						"execution_count": 52
 					},
 					{
 						"cell_type": "markdown",
@@ -529,7 +528,7 @@
 							"display(df_combined_taxi.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 33
+						"execution_count": 53
 					},
 					{
 						"cell_type": "code",
@@ -558,7 +557,7 @@
 							"latlong_filtered_df.count()"
 						],
 						"outputs": [],
-						"execution_count": 34
+						"execution_count": 54
 					},
 					{
 						"cell_type": "markdown",
@@ -592,7 +591,7 @@
 							"display(latlong_filtered_df.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 35
+						"execution_count": 55
 					},
 					{
 						"cell_type": "code",
@@ -619,7 +618,7 @@
 							"display(normalized_df.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 36
+						"execution_count": 56
 					},
 					{
 						"cell_type": "markdown",
@@ -653,7 +652,7 @@
 							"display(normalized_df.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 37
+						"execution_count": 57
 					},
 					{
 						"cell_type": "code",
@@ -680,7 +679,7 @@
 							"display(normalized_df.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 38
+						"execution_count": 58
 					},
 					{
 						"cell_type": "markdown",
@@ -719,7 +718,7 @@
 							"normalized_df.groupBy(\"store_forward\").count().show()"
 						],
 						"outputs": [],
-						"execution_count": 39
+						"execution_count": 59
 					},
 					{
 						"cell_type": "markdown",
@@ -760,7 +759,7 @@
 							"print(final_df.count())"
 						],
 						"outputs": [],
-						"execution_count": 40
+						"execution_count": 60
 					},
 					{
 						"cell_type": "markdown",
@@ -792,7 +791,7 @@
 							"df_combined_taxi.write.mode(\"overwrite\").synapsesql(\"synapseazuremldedicates.dbo.reg_transformed_taxi_data\")"
 						],
 						"outputs": [],
-						"execution_count": 41
+						"execution_count": 61
 					},
 					{
 						"cell_type": "markdown",
@@ -826,7 +825,7 @@
 							"bucketed_df.groupBy(\"cost_class\").count().show()"
 						],
 						"outputs": [],
-						"execution_count": 42
+						"execution_count": 62
 					},
 					{
 						"cell_type": "code",
@@ -846,7 +845,7 @@
 							"display(bucketed_df.head(10))"
 						],
 						"outputs": [],
-						"execution_count": 43
+						"execution_count": 63
 					},
 					{
 						"cell_type": "code",
@@ -865,7 +864,7 @@
 							"bucketed_df.write.mode(\"overwrite\").synapsesql(\"synapseazuremldedicates.dbo.class_transformed_taxi_data\")"
 						],
 						"outputs": [],
-						"execution_count": 44
+						"execution_count": 64
 					},
 					{
 						"cell_type": "code",
@@ -911,7 +910,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "17e0fd83-7d06-44a3-aaf5-57cca0e6c50a"
+						"spark.autotune.trackingId": "563c1cfb-9be9-490d-b04d-9287859b91b1"
 					}
 				},
 				"metadata": {
@@ -962,6 +961,8 @@
 							"# Importing pyspark dependencies\r\n",
 							"from pyspark.sql.types import IntegerType,BooleanType,DateType,NumericType,TimestampType\r\n",
 							"from pyspark.ml.feature import Binarizer, Bucketizer, QuantileDiscretizer\r\n",
+							"from com.microsoft.spark.sqlanalytics.Constants import Constants\r\n",
+							"import com.microsoft.spark.sqlanalytics\r\n",
 							"from pyspark.sql.functions import col\r\n",
 							"import pyspark.sql.functions as F\r\n",
 							"\r\n",
@@ -969,6 +970,7 @@
 							"from mlflow.models import infer_signature, set_signature\r\n",
 							"from mlflow.models.model import get_model_info\r\n",
 							"import mlflow\r\n",
+							"\r\n",
 							"\r\n",
 							"# Importing general libraries\r\n",
 							"from sklearn.metrics import accuracy_score, f1_score, precision_score, confusion_matrix, recall_score, roc_auc_score, classification_report\r\n",
@@ -978,10 +980,15 @@
 							"from notebookutils.mssparkutils import azureML\r\n",
 							"linked_service_name = \"AzureMLService1\"\r\n",
 							"ws = azureML.getWorkspace(linked_service_name)\r\n",
-							"mlflow.set_tracking_uri(ws.get_mlflow_tracking_uri())"
+							"mlflow.set_tracking_uri(ws.get_mlflow_tracking_uri().replace(\"v2.0\",\"v1.0\"))\r\n",
+							"\r\n",
+							"## Importing SynapseML\r\n",
+							"from synapse.ml.featurize import Featurize\r\n",
+							"from synapse.ml.lightgbm import *\r\n",
+							"from synapse.ml.train import ComputeModelStatistics"
 						],
 						"outputs": [],
-						"execution_count": 3
+						"execution_count": 133
 					},
 					{
 						"cell_type": "code",
@@ -994,18 +1001,19 @@
 								"transient": {
 									"deleting": false
 								}
-							}
+							},
+							"collapsed": false
 						},
 						"source": [
 							"# Read from existing internal table\r\n",
 							"df = (spark.read\r\n",
-							"                     .synapsesql(\"synapseazuremldedicates.dbo.class_transformed_taxi_data\"))\r\n",
+							"                     .synapsesql(\"synapseazuremldedicates.dbo.class_transformed_taxi_data\")).drop('cost')\r\n",
 							"\r\n",
 							"# Show contents of the dataframe\r\n",
-							"df(df.head(5))"
+							"display(df.head(5))"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 134
 					},
 					{
 						"cell_type": "markdown",
@@ -1034,15 +1042,98 @@
 							}
 						},
 						"source": [
-							"# Read from existing internal table\r\n",
-							"green_raw = (spark.read\r\n",
-							"                     .synapsesql(\"synapseazuremldedicates.dbo.greenTaxiData\"))\r\n",
+							"train_df = df.sampleBy(\"cost_class\", fractions={0: 0.7, 1: 0.7, 2: 0.7, 3: 0.7, 4: 0.7}, seed=10)\r\n",
 							"\r\n",
-							"# Show contents of the dataframe\r\n",
-							"display(green_raw.head(5))"
+							"print(\"----------------------------------------------------------------------\")\r\n",
+							"print(\"Printing count of train dataset\")\r\n",
+							"train_df.groupBy(\"cost_class\").count().show()\r\n",
+							"\r\n",
+							"test_df = df.subtract(train_df)\r\n",
+							"\r\n",
+							"print(\"----------------------------------------------------------------------\")\r\n",
+							"print(\"Printing count of test dataset\")\r\n",
+							"test_df.groupBy(\"cost_class\").count().show()"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 135
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": true
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"mlflow.autolog(exclusive=False)\r\n",
+							"\r\n",
+							"#Set MLflow experiment.\r\n",
+							"experiment_name = \"taxi-classifier-experiment\"\r\n",
+							"mlflow.set_experiment(experiment_name)\r\n",
+							"\r\n",
+							"with mlflow.start_run(run_name=\"class_test\") as run:\r\n",
+							"    feature_cols = [column for column in train_df.columns if column!=\"cost_class\"]\r\n",
+							"    featurize = (Featurize()\r\n",
+							"    .setOutputCol(\"features\")\r\n",
+							"    .setInputCols(feature_cols)\r\n",
+							"    .setOneHotEncodeCategoricals(True)\r\n",
+							"    .setNumFeatures(4096))\r\n",
+							"    train_df_trans = featurize.fit(train_df).transform(train_df)\r\n",
+							"    test_df_trans = featurize.fit(test_df).transform(test_df)\r\n",
+							"    # Use mlflow.spark.save_model to save the model to your path\r\n",
+							"    mlflow.spark.save_model(lightgbm_model, \"featurizer\")\r\n",
+							"    # Use mlflow.spark.log_model to log the model if you have a connected mlflow service\r\n",
+							"    mlflow.spark.log_model(lightgbm_model, \"featurizer\")\r\n",
+							"\r\n",
+							"    lightgbm_classifier = (LightGBMClassifier()\r\n",
+							"            .setFeaturesCol(\"features\")\r\n",
+							"            .setRawPredictionCol(\"rawPrediction\")\r\n",
+							"            .setDefaultListenPort(12402)\r\n",
+							"            .setNumLeaves(5)\r\n",
+							"            .setNumIterations(10)\r\n",
+							"            .setObjective(\"multiclass\")\r\n",
+							"            .setLabelCol(\"cost_class\")\r\n",
+							"            .setLeafPredictionCol(\"leafPrediction\")\r\n",
+							"            .setFeaturesShapCol(\"featuresShap\"))\r\n",
+							"\r\n",
+							"    lightgbm_model = lightgbm_classifier.fit(train_df_trans)\r\n",
+							"\r\n",
+							"    # Use mlflow.spark.save_model to save the model to your path\r\n",
+							"    mlflow.spark.save_model(lightgbm_model, \"lightgbm_model\")\r\n",
+							"    # Use mlflow.spark.log_model to log the model if you have a connected mlflow service\r\n",
+							"    mlflow.spark.log_model(lightgbm_model, \"lightgbm_model\")\r\n",
+							"\r\n",
+							"    # Use mlflow.pyfunc.load_model to load model back as PyFuncModel and apply predict\r\n",
+							"    model = mlflow.pyfunc.load_model(\"lightgbm_model\")\r\n",
+							"    prediction = model.predict(train_df_trans.toPandas())\r\n",
+							"    prediction = list(map(str, prediction))\r\n",
+							"    #mlflow.log_param(\"prediction\", \",\".join(prediction))\r\n",
+							"\r\n",
+							"    # Use mlflow.spark.load_model to load model back as PipelineModel and apply transform\r\n",
+							"    predictions = mlflow.spark.load_model(\"lightgbm_model\").transform(train_df_trans)\r\n",
+							"    metrics = ComputeModelStatistics(evaluationMetric=\"classification\", labelCol='cost_class', scoredLabelsCol='prediction').transform(predictions).collect()\r\n",
+							"    mlflow.log_metric(\"Train accuracy\", metrics[0]['accuracy'])\r\n",
+							"    print(metrics)\r\n",
+							"    \r\n",
+							"\r\n",
+							"    y_true = train_df_trans.select(\"cost_class\").rdd.flatMap(lambda x: x).collect()\r\n",
+							"    y_pred = model.predict(test_df_trans.toPandas())\r\n",
+							"    test_accuracy = accuracy_score(y_true,y_pred)\r\n",
+							"    mlflow.log_metric('test_accuracy', test_accuracy)\r\n",
+							"    mlflow.log_metric('test_F1_Macro',f1_score(y_true,y_pred,average='macro'))\r\n",
+							"    mlflow.log_metric('test_Precision_Macro',precision_score(y_true,y_pred,average='macro'))\r\n",
+							"    mlflow.log_metric('test_Recall_Macro', recall_score(y_true,y_pred,average='macro'))\r\n",
+							"\r\n",
+							"    mlflow.end_run()"
+						],
+						"outputs": [],
+						"execution_count": 137
 					},
 					{
 						"cell_type": "code",
@@ -1077,7 +1168,180 @@
 							}
 						},
 						"source": [
-							""
+							"predictions = mlflow.spark.load_model(\"lightgbm_model\").transform(train_df_trans)"
+						],
+						"outputs": [],
+						"execution_count": 152
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"display(predictions)"
+						],
+						"outputs": [],
+						"execution_count": 153
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"model = mlflow.pyfunc.load_model(\"lightgbm_model\")"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"display(lightgbm_model.transform(train_df_trans))"
+						],
+						"outputs": [],
+						"execution_count": 149
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### 2.4 Registering model and featurizer"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## Registering featurizer\r\n",
+							"model_name = 'featurizer'\r\n",
+							"model_uri = f\"runs:/{run.info.run_id}/featurizer\"\r\n",
+							"mlflow.register_model(model_uri=model_uri, name=model_name)\r\n",
+							"\r\n",
+							"## Registering Classifier \r\n",
+							"model_name = 'classification_demo'\r\n",
+							"model_uri = f\"runs:/{run.info.run_id}/lightgbm_model\"\r\n",
+							"mlflow.register_model(model_uri=model_uri, name=model_name)"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### --------------------------------------------------------------------------- ###\r\n",
+							"model_name = 'featurizer'\r\n",
+							"# Search registered models for the \r\n",
+							"for model in mlflow.search_registered_models():\r\n",
+							"    if model.name == model_name:\r\n",
+							"        latest_version_run_id = model.latest_versions[0].run_id\r\n",
+							"        model_found = True\r\n",
+							"        break\r\n",
+							"\r\n",
+							"# load model from Azure Machine Learning\r\n",
+							"run_id = latest_version_run_id\r\n",
+							"artifact_path = \"featurizer\"\r\n",
+							"model_uri = f\"runs:/{run_id}/{artifact_path}\"\r\n",
+							"featurizer = mlflow.pyfunc.load_model(model_uri)\r\n",
+							"\r\n",
+							"### --------------------------------------------------------------------------- ###\r\n",
+							"\r\n",
+							"model_name = 'classification_demo'\r\n",
+							"# Search registered models for the \r\n",
+							"for model in mlflow.search_registered_models():\r\n",
+							"    if model.name == model_name:\r\n",
+							"        latest_version_run_id = model.latest_versions[0].run_id\r\n",
+							"        model_found = True\r\n",
+							"        break\r\n",
+							"\r\n",
+							"# load model from Azure Machine Learning\r\n",
+							"run_id = latest_version_run_id\r\n",
+							"artifact_path = \"lightgbm_model\"\r\n",
+							"model_uri = f\"runs:/{run_id}/{artifact_path}\"\r\n",
+							"model = mlflow.pyfunc.load_model(model_uri)\r\n",
+							"\r\n",
+							"### --------------------------------------------------------------------------- ###\r\n",
+							"\r\n",
+							"test_df_trans = featurizer.fit(test_df).transform(test_df)\r\n",
+							"\r\n",
+							"# testing model\r\n",
+							"model.predict(test_df_trans.toPandas())"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"model = mlflow.pyfunc.load_model(model_uri=f\"models:/{classification_demo}/{model_version}\")"
 						],
 						"outputs": [],
 						"execution_count": null
