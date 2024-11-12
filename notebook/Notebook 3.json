@@ -18,15 +18,16 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b37c89de-93a2-4852-8f7d-3aecae4366a5"
+				"spark.autotune.trackingId": "d2138859-f613-46ce-b6b0-d0aff230106a"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
-			"synapse_widget": {
-				"version": "0.1"
-			},
 			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
 			"language_info": {
 				"name": "python"
 			},
@@ -37,14 +38,13 @@
 				"endpoint": "https://synapsemlws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/synapseml",
 				"auth": {
 					"type": "AAD",
-					"authResource": "https://dev.azuresynapse.net",
-					"authHeader": null
+					"authResource": "https://dev.azuresynapse.net"
 				},
 				"sparkVersion": "3.4",
 				"nodeCount": 10,
 				"cores": 8,
 				"memory": 56,
-				"extraHeader": null
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -75,7 +75,7 @@
 					"# Show contents of the dataframe\r\n",
 					"dfToReadFromTable.show()"
 				],
-				"execution_count": 59
+				"execution_count": 3
 			},
 			{
 				"cell_type": "markdown",
@@ -111,7 +111,7 @@
 					"val df = spark.read.synapsesql(\"synapseazuremldedicates.dbo.Customers\") \r\n",
 					"df.show()"
 				],
-				"execution_count": 60
+				"execution_count": 4
 			},
 			{
 				"cell_type": "markdown",
