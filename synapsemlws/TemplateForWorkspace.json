@@ -168,7 +168,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "d8596ad0-adc0-4175-9f15-abc0018d99f9"
+						"spark.autotune.trackingId": "d05ddc31-c0cf-4c64-a353-e94535902df5"
 					}
 				},
 				"metadata": {
@@ -193,7 +193,8 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56
+						"memory": 56,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -229,11 +230,36 @@
 							"\r\n",
 							"# Importing general libraries\r\n",
 							"from sklearn.metrics import accuracy_score, f1_score, precision_score, confusion_matrix, recall_score, roc_auc_score, classification_report\r\n",
-							"import flaml.visualization as fviz\r\n",
 							"import pandas as pd"
 						],
 						"outputs": [],
-						"execution_count": 1
+						"execution_count": 7
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### 1.1 Read raw data from CSV"
+						]
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#### 1.1.1 Reading green taxi data"
+						]
 					},
 					{
 						"cell_type": "code",
@@ -246,7 +272,8 @@
 								"transient": {
 									"deleting": false
 								}
-							}
+							},
+							"collapsed": false
 						},
 						"source": [
 							"# Read from existing internal table\r\n",
@@ -254,10 +281,46 @@
 							"                     .synapsesql(\"synapseazuremldedicates.dbo.greenTaxiData\"))\r\n",
 							"\r\n",
 							"# Show contents of the dataframe\r\n",
-							"green_raw.show()"
+							"display(green_raw.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 2
+						"execution_count": 9
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"green_columns_remap =    {\r\n",
+							"        \"vendorID\": \"vendor\",\r\n",
+							"        \"lpepPickupDatetime\": \"pickup_datetime\",\r\n",
+							"        \"lpepDropoffDatetime\": \"dropoff_datetime\",\r\n",
+							"        \"storeAndFwdFlag\": \"store_forward\",\r\n",
+							"        \"pickupLongitude\": \"pickup_longitude\",\r\n",
+							"        \"pickupLatitude\": \"pickup_latitude\",\r\n",
+							"        \"dropoffLongitude\": \"dropoff_longitude\",\r\n",
+							"        \"dropoffLatitude\": \"dropoff_latitude\",\r\n",
+							"        \"passengerCount\": \"passengers\",\r\n",
+							"        \"fareAmount\": \"cost\",\r\n",
+							"        \"tripDistance\": \"distance\",\r\n",
+							"    }\r\n",
+							"\r\n",
+							"select_expr = [f\"{col} as {new_name}\" for col, new_name in green_columns_remap.items()]\r\n",
+							"green_remapped = green_raw.selectExpr(*select_expr)\r\n",
+							"display(green_remapped.head(5))"
+						],
+						"outputs": [],
+						"execution_count": 11
 					},
 					{
 						"cell_type": "markdown",
@@ -269,7 +332,81 @@
 							}
 						},
 						"source": [
-							"## Use the Azure SQL and SQL Server connector"
+							"#### 1.1.2 Reading yellow taxi data"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"# Read from existing internal table\r\n",
+							"yellow_raw  = (spark.read\r\n",
+							"                     .synapsesql(\"synapseazuremldedicates.dbo.yellowTaxiData\"))\r\n",
+							"\r\n",
+							"# Show contents of the dataframe\r\n",
+							"display(yellow_raw.head(5))"
+						],
+						"outputs": [],
+						"execution_count": 12
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"yellow_columns_remap = {\r\n",
+							"        \"vendorID\": \"vendor\",\r\n",
+							"        \"tpepPickupDateTime\": \"pickup_datetime\",\r\n",
+							"        \"tpepDropoffDateTime\": \"dropoff_datetime\",\r\n",
+							"        \"storeAndFwdFlag\": \"store_forward\",\r\n",
+							"        \"startLon\": \"pickup_longitude\",\r\n",
+							"        \"startLat\": \"pickup_latitude\",\r\n",
+							"        \"endLon\": \"dropoff_longitude\",\r\n",
+							"        \"endLat\": \"dropoff_latitude\",\r\n",
+							"        \"passengerCount\": \"passengers\",\r\n",
+							"        \"fareAmount\": \"cost\",\r\n",
+							"        \"tripDistance\": \"distance\",\r\n",
+							"    }\r\n",
+							"\r\n",
+							"select_expr = [f\"{col} as {new_name}\" for col, new_name in yellow_columns_remap.items()]\r\n",
+							"yellow_remapped = yellow_raw.selectExpr(*select_expr)\r\n",
+							"display(yellow_remapped.head(5))"
+						],
+						"outputs": [],
+						"execution_count": 13
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### 1.2 Combining data from raw data sources"
 						]
 					},
 					{
@@ -286,17 +423,31 @@
 							}
 						},
 						"source": [
-							"1+1"
+							"df_combined_taxi = green_remapped.union(yellow_remapped)\r\n",
+							"\r\n",
+							"print(\"Length of Green DataFrame :\" , green_remapped.count())\r\n",
+							"print(\"Length of Yellow DataFrame :\" , yellow_remapped.count())\r\n",
+							"print(\"Length of combined dataframes :\" , df_combined_taxi.count())"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 14
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### 1.3 Saving merged dataset as table"
+						]
 					},
 					{
 						"cell_type": "code",
 						"metadata": {
-							"microsoft": {
-								"language": "scala"
-							},
 							"jupyter": {
 								"source_hidden": false,
 								"outputs_hidden": false
@@ -308,16 +459,401 @@
 							}
 						},
 						"source": [
-							"%%spark\r\n",
-							"val df = spark.read.synapsesql(\"synapseazuremldedicates.dbo.Customers\") \r\n",
-							"df.show()"
+							"#https://learn.microsoft.com/en-us/azure/synapse-analytics/spark/synapse-spark-sql-pool-import-export?tabs=scala%2Cscala1%2Cscala2%2Cscala3%2Cscala4%2Cpython5#write-using-basic-authentication"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 15
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"df_combined_taxi.write.mode(\"overwrite\").synapsesql(\"synapseazuremldedicates.dbo.combined_taxi_data\")"
+						],
+						"outputs": [],
+						"execution_count": 17
 					},
 					{
 						"cell_type": "markdown",
 						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### 1.4 Data Transformation"
+						]
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#### 1.4.1 Transforming float64 fields"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"# Convert String to Integer Type\r\n",
+							"df_combined_taxi = df_combined_taxi.withColumn(\"pickup_longitude\",df_combined_taxi.pickup_longitude.cast('double')).withColumn(\"pickup_latitude\",df_combined_taxi.pickup_latitude.cast('double')).withColumn(\"dropoff_longitude\",df_combined_taxi.dropoff_longitude.cast('double')).withColumn(\"dropoff_latitude\",df_combined_taxi.dropoff_latitude.cast('double')).withColumn(\"distance\",df_combined_taxi.distance.cast('double')).withColumn(\"cost\",df_combined_taxi.cost.cast('double')).withColumn(\"passengers\",df_combined_taxi.passengers.cast('int'))\r\n",
+							"display(df_combined_taxi.head(5))"
+						],
+						"outputs": [],
+						"execution_count": 18
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"latlong_filtered_df = df_combined_taxi.filter( (df_combined_taxi.pickup_longitude <= -73.72) & \\\r\n",
+							"(df_combined_taxi.pickup_longitude >= -74.09) & \\\r\n",
+							"(df_combined_taxi.pickup_latitude  <= 40.88) \\\r\n",
+							"& (df_combined_taxi.pickup_latitude >= 40.53)\\\r\n",
+							"& (df_combined_taxi.dropoff_longitude <= -73.72)\\\r\n",
+							"& (df_combined_taxi.dropoff_longitude >= -74.72)\\\r\n",
+							"& (df_combined_taxi.dropoff_latitude <= 40.88)\\\r\n",
+							"& (df_combined_taxi.dropoff_latitude >= 40.53)\\\r\n",
+							")\r\n",
+							"\r\n",
+							"latlong_filtered_df.count()"
+						],
+						"outputs": [],
+						"execution_count": 19
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#### 1.4.2 Transforming pickup_datetime"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"latlong_filtered_df = latlong_filtered_df.withColumn(\"pickup_datetime\",df_combined_taxi.pickup_datetime.cast(TimestampType()))\r\n",
+							"display(latlong_filtered_df.head(5))"
+						],
+						"outputs": [],
+						"execution_count": 20
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"normalized_df = latlong_filtered_df.withColumn('pickup_weekday',(F.dayofweek('pickup_datetime')))\\\r\n",
+							"    .withColumn('pickup_month',(F.month('pickup_datetime')))\\\r\n",
+							"    .withColumn('pickup_monthday',(F.dayofmonth('pickup_datetime')))\\\r\n",
+							"    .withColumn('pickup_hour',(F.hour('pickup_datetime')))\\\r\n",
+							"    .withColumn('pickup_minute',(F.minute('pickup_datetime')))\\\r\n",
+							"    .withColumn('pickup_second',(F.second('pickup_datetime'))).drop(\"pickup_datetime\")\r\n",
+							"\r\n",
+							"display(normalized_df.head(5))"
+						],
+						"outputs": [],
+						"execution_count": 21
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#### 1.4.3 Transforming dropoff_datetime"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"normalized_df = normalized_df.withColumn(\"dropoff_datetime\",normalized_df.dropoff_datetime.cast(TimestampType()))\r\n",
+							"display(normalized_df.head(5))"
+						],
+						"outputs": [],
+						"execution_count": 22
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"normalized_df = normalized_df.withColumn('dropoff_weekday',(F.dayofweek('dropoff_datetime')))\\\r\n",
+							"    .withColumn('dropoff_month',(F.month('dropoff_datetime')))\\\r\n",
+							"    .withColumn('dropoff_monthday',(F.dayofmonth('dropoff_datetime')))\\\r\n",
+							"    .withColumn('dropoff_hour',(F.hour('dropoff_datetime')))\\\r\n",
+							"    .withColumn('dropoff_minute',(F.minute('dropoff_datetime')))\\\r\n",
+							"    .withColumn('dropoff_second',(F.second('dropoff_datetime'))).drop(\"dropoff_datetime\")\r\n",
+							"\r\n",
+							"display(normalized_df.head(5))"
+						],
+						"outputs": [],
+						"execution_count": 23
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#### 1.4.4 Change the store_forward column to binary values\r\n",
+							""
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"print(\"--------------- Count before transforming into binary values ---------------\")\r\n",
+							"latlong_filtered_df.groupBy(\"store_forward\").count().show()\r\n",
+							"\r\n",
+							"normalized_df = normalized_df.withColumn('store_forward', F.when(F.col('store_forward') == \"Y\", F.lit(1)).otherwise(F.lit(0)))\r\n",
+							"\r\n",
+							"print(\"--------------- Count after transforming into binary values ---------------\")\r\n",
+							"normalized_df.groupBy(\"store_forward\").count().show()"
+						],
+						"outputs": [],
+						"execution_count": 24
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#### 1.4.5 Filtering by distance and cost"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"print(\"--------------- Count before filter ---------------\")\r\n",
+							"print(normalized_df.count())\r\n",
+							"\r\n",
+							"final_df = normalized_df.filter( (normalized_df.distance > 0) & \\\r\n",
+							"(normalized_df.cost > 0))\r\n",
+							"\r\n",
+							"final_df.count()\r\n",
+							"\r\n",
+							"print(\"--------------- Count after filter ---------------\")\r\n",
+							"print(final_df.count())"
+						],
+						"outputs": [],
+						"execution_count": 25
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### 1.5 Save Transformed regression Data"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"df_combined_taxi.write.mode(\"overwrite\").synapsesql(\"synapseazuremldedicates.dbo.reg_transformed_taxi_data\")"
+						],
+						"outputs": [],
+						"execution_count": 26
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### 1.6 Transform target into classes and saving table"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"discretizer = QuantileDiscretizer(numBuckets=5, inputCol=\"cost\", outputCol=\"cost_class\")\r\n",
+							"bucketed_df = discretizer.fit(final_df).transform(final_df)\r\n",
+							"bucketed_df.groupBy(\"cost_class\").count().show()"
+						],
+						"outputs": [],
+						"execution_count": 27
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"display(bucketed_df.head(10))"
+						],
+						"outputs": [],
+						"execution_count": 28
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
 							"nteract": {
 								"transient": {
 									"deleting": false
@@ -326,7 +862,161 @@
 						},
 						"source": [
 							""
-						]
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
 					}
 				]
 			},
