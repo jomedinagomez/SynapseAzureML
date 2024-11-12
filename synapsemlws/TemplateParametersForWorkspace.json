@@ -11,6 +11,12 @@
 		"synapsemlws-WorkspaceDefaultSqlServer_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapsemlws.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
+		"AzureMLService1_properties_typeProperties_subscriptionId": {
+			"value": "14585b9f-5c83-4a76-8055-42149123f99f"
+		},
+		"AzureMLService1_properties_typeProperties_resourceGroupName": {
+			"value": "SynapseMLrg"
+		},
 		"synapsemlws-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://synapseadslg2.dfs.core.windows.net"
 		}
