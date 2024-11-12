@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "66f8d41e-7065-4ad4-9e0e-e8d8ae2c46f3"
+				"spark.autotune.trackingId": "ff0b1c1d-f5dc-4831-be60-5156d97898d9"
 			}
 		},
 		"metadata": {
@@ -82,7 +82,7 @@
 					"from sklearn.metrics import accuracy_score, f1_score, precision_score, confusion_matrix, recall_score, roc_auc_score, classification_report\r\n",
 					"import pandas as pd"
 				],
-				"execution_count": 7
+				"execution_count": 57
 			},
 			{
 				"cell_type": "markdown",
@@ -132,7 +132,7 @@
 					"# Show contents of the dataframe\r\n",
 					"display(green_raw.head(5))"
 				],
-				"execution_count": 9
+				"execution_count": 58
 			},
 			{
 				"cell_type": "code",
@@ -167,7 +167,7 @@
 					"green_remapped = green_raw.selectExpr(*select_expr)\r\n",
 					"display(green_remapped.head(5))"
 				],
-				"execution_count": 11
+				"execution_count": 59
 			},
 			{
 				"cell_type": "markdown",
@@ -204,7 +204,7 @@
 					"# Show contents of the dataframe\r\n",
 					"display(yellow_raw.head(5))"
 				],
-				"execution_count": 12
+				"execution_count": 60
 			},
 			{
 				"cell_type": "code",
@@ -239,7 +239,7 @@
 					"yellow_remapped = yellow_raw.selectExpr(*select_expr)\r\n",
 					"display(yellow_remapped.head(5))"
 				],
-				"execution_count": 13
+				"execution_count": 61
 			},
 			{
 				"cell_type": "markdown",
@@ -274,7 +274,7 @@
 					"print(\"Length of Yellow DataFrame :\" , yellow_remapped.count())\r\n",
 					"print(\"Length of combined dataframes :\" , df_combined_taxi.count())"
 				],
-				"execution_count": 14
+				"execution_count": 62
 			},
 			{
 				"cell_type": "markdown",
@@ -305,7 +305,7 @@
 				"source": [
 					"#https://learn.microsoft.com/en-us/azure/synapse-analytics/spark/synapse-spark-sql-pool-import-export?tabs=scala%2Cscala1%2Cscala2%2Cscala3%2Cscala4%2Cpython5#write-using-basic-authentication"
 				],
-				"execution_count": 15
+				"execution_count": 63
 			},
 			{
 				"cell_type": "code",
@@ -323,7 +323,7 @@
 				"source": [
 					"df_combined_taxi.write.mode(\"overwrite\").synapsesql(\"synapseazuremldedicates.dbo.combined_taxi_data\")"
 				],
-				"execution_count": 17
+				"execution_count": 64
 			},
 			{
 				"cell_type": "markdown",
@@ -370,7 +370,7 @@
 					"df_combined_taxi = df_combined_taxi.withColumn(\"pickup_longitude\",df_combined_taxi.pickup_longitude.cast('double')).withColumn(\"pickup_latitude\",df_combined_taxi.pickup_latitude.cast('double')).withColumn(\"dropoff_longitude\",df_combined_taxi.dropoff_longitude.cast('double')).withColumn(\"dropoff_latitude\",df_combined_taxi.dropoff_latitude.cast('double')).withColumn(\"distance\",df_combined_taxi.distance.cast('double')).withColumn(\"cost\",df_combined_taxi.cost.cast('double')).withColumn(\"passengers\",df_combined_taxi.passengers.cast('int'))\r\n",
 					"display(df_combined_taxi.head(5))"
 				],
-				"execution_count": 18
+				"execution_count": 65
 			},
 			{
 				"cell_type": "code",
@@ -398,7 +398,7 @@
 					"\r\n",
 					"latlong_filtered_df.count()"
 				],
-				"execution_count": 19
+				"execution_count": 66
 			},
 			{
 				"cell_type": "markdown",
@@ -424,6 +424,27 @@
 						"transient": {
 							"deleting": false
 						}
+					}
+				},
+				"source": [
+					"from pyspark.sql.functions import to_timestamp\r\n",
+					"df = spark.createDataFrame([('1997-02-28 10:30:00',)], ['t'])\r\n",
+					"df.select(to_timestamp(df.t, 'yyyy-MM-dd HH:mm:ss').alias('dt')).collect()\r\n",
+					"display(df)"
+				],
+				"execution_count": 76
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
 					},
 					"collapsed": false
 				},
@@ -431,7 +452,7 @@
 					"latlong_filtered_df = latlong_filtered_df.withColumn(\"pickup_datetime\",df_combined_taxi.pickup_datetime.cast(TimestampType()))\r\n",
 					"display(latlong_filtered_df.head(5))"
 				],
-				"execution_count": 20
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -457,7 +478,7 @@
 					"\r\n",
 					"display(normalized_df.head(5))"
 				],
-				"execution_count": 21
+				"execution_count": 68
 			},
 			{
 				"cell_type": "markdown",
@@ -490,7 +511,7 @@
 					"normalized_df = normalized_df.withColumn(\"dropoff_datetime\",normalized_df.dropoff_datetime.cast(TimestampType()))\r\n",
 					"display(normalized_df.head(5))"
 				],
-				"execution_count": 22
+				"execution_count": 69
 			},
 			{
 				"cell_type": "code",
@@ -516,7 +537,7 @@
 					"\r\n",
 					"display(normalized_df.head(5))"
 				],
-				"execution_count": 23
+				"execution_count": 70
 			},
 			{
 				"cell_type": "markdown",
@@ -554,7 +575,7 @@
 					"print(\"--------------- Count after transforming into binary values ---------------\")\r\n",
 					"normalized_df.groupBy(\"store_forward\").count().show()"
 				],
-				"execution_count": 24
+				"execution_count": 71
 			},
 			{
 				"cell_type": "markdown",
@@ -594,7 +615,7 @@
 					"print(\"--------------- Count after filter ---------------\")\r\n",
 					"print(final_df.count())"
 				],
-				"execution_count": 25
+				"execution_count": 72
 			},
 			{
 				"cell_type": "markdown",
@@ -625,7 +646,7 @@
 				"source": [
 					"df_combined_taxi.write.mode(\"overwrite\").synapsesql(\"synapseazuremldedicates.dbo.reg_transformed_taxi_data\")"
 				],
-				"execution_count": 26
+				"execution_count": 73
 			},
 			{
 				"cell_type": "markdown",
@@ -658,7 +679,7 @@
 					"bucketed_df = discretizer.fit(final_df).transform(final_df)\r\n",
 					"bucketed_df.groupBy(\"cost_class\").count().show()"
 				],
-				"execution_count": 27
+				"execution_count": 74
 			},
 			{
 				"cell_type": "code",
@@ -671,12 +692,13 @@
 						"transient": {
 							"deleting": false
 						}
-					}
+					},
+					"collapsed": false
 				},
 				"source": [
 					"display(bucketed_df.head(10))"
 				],
-				"execution_count": 28
+				"execution_count": 75
 			},
 			{
 				"cell_type": "code",
