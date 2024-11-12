@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d2138859-f613-46ce-b6b0-d0aff230106a"
+				"spark.autotune.trackingId": "d8596ad0-adc0-4175-9f15-abc0018d99f9"
 			}
 		},
 		"metadata": {
@@ -63,19 +63,50 @@
 					}
 				},
 				"source": [
+					"# Importing pyspark dependencies\r\n",
+					"from pyspark.sql.types import IntegerType,BooleanType,DateType,NumericType,TimestampType\r\n",
+					"from pyspark.ml.feature import Binarizer, Bucketizer, QuantileDiscretizer\r\n",
+					"from pyspark.sql.functions import col\r\n",
+					"import pyspark.sql.functions as F\r\n",
+					"\r\n",
 					"# Add required imports\r\n",
 					"import com.microsoft.spark.sqlanalytics\r\n",
 					"from com.microsoft.spark.sqlanalytics.Constants import Constants\r\n",
-					"from pyspark.sql.functions import col\r\n",
 					"\r\n",
+					"# Importing mlflow libraries\r\n",
+					"from mlflow.models import infer_signature, set_signature\r\n",
+					"from mlflow.models.model import get_model_info\r\n",
+					"import mlflow\r\n",
+					"\r\n",
+					"# Importing general libraries\r\n",
+					"from sklearn.metrics import accuracy_score, f1_score, precision_score, confusion_matrix, recall_score, roc_auc_score, classification_report\r\n",
+					"import flaml.visualization as fviz\r\n",
+					"import pandas as pd"
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
 					"# Read from existing internal table\r\n",
-					"dfToReadFromTable = (spark.read\r\n",
-					"                     .synapsesql(\"synapseazuremldedicates.dbo.Customers\"))\r\n",
+					"green_raw = (spark.read\r\n",
+					"                     .synapsesql(\"synapseazuremldedicates.dbo.greenTaxiData\"))\r\n",
 					"\r\n",
 					"# Show contents of the dataframe\r\n",
-					"dfToReadFromTable.show()"
+					"green_raw.show()"
 				],
-				"execution_count": 3
+				"execution_count": 2
 			},
 			{
 				"cell_type": "markdown",
@@ -89,6 +120,24 @@
 				"source": [
 					"## Use the Azure SQL and SQL Server connector"
 				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"1+1"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -111,7 +160,7 @@
 					"val df = spark.read.synapsesql(\"synapseazuremldedicates.dbo.Customers\") \r\n",
 					"df.show()"
 				],
-				"execution_count": 4
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
