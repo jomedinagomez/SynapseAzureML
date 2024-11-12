@@ -1386,7 +1386,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "3eeeea61-4c7c-4efa-86e6-ee84ae6943e4"
+						"spark.autotune.trackingId": "58f6468b-ce6e-4f1a-b173-4d1d3bc5daeb"
 					}
 				},
 				"metadata": {
@@ -1417,6 +1417,25 @@
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"##https://github.com/microsoft/SynapseML/blob/master/docs/Use%20with%20MLFlow/Overview.md"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
 					{
 						"cell_type": "markdown",
 						"metadata": {
