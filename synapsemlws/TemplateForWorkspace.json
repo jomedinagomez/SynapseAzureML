@@ -910,7 +910,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "563c1cfb-9be9-490d-b04d-9287859b91b1"
+						"spark.autotune.trackingId": "0fa409a5-1008-4e9b-ae4f-a4ef3d60bdfc"
 					}
 				},
 				"metadata": {
@@ -988,7 +988,7 @@
 							"from synapse.ml.train import ComputeModelStatistics"
 						],
 						"outputs": [],
-						"execution_count": 133
+						"execution_count": 157
 					},
 					{
 						"cell_type": "code",
@@ -1013,7 +1013,7 @@
 							"display(df.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 134
+						"execution_count": 158
 					},
 					{
 						"cell_type": "markdown",
@@ -1055,7 +1055,7 @@
 							"test_df.groupBy(\"cost_class\").count().show()"
 						],
 						"outputs": [],
-						"execution_count": 135
+						"execution_count": 159
 					},
 					{
 						"cell_type": "code",
@@ -1087,9 +1087,9 @@
 							"    train_df_trans = featurize.fit(train_df).transform(train_df)\r\n",
 							"    test_df_trans = featurize.fit(test_df).transform(test_df)\r\n",
 							"    # Use mlflow.spark.save_model to save the model to your path\r\n",
-							"    mlflow.spark.save_model(lightgbm_model, \"featurizer\")\r\n",
+							"    mlflow.spark.save_model(featurize, \"featurizer\")\r\n",
 							"    # Use mlflow.spark.log_model to log the model if you have a connected mlflow service\r\n",
-							"    mlflow.spark.log_model(lightgbm_model, \"featurizer\")\r\n",
+							"    mlflow.spark.log_model(featurize, \"featurizer\")\r\n",
 							"\r\n",
 							"    lightgbm_classifier = (LightGBMClassifier()\r\n",
 							"            .setFeaturesCol(\"features\")\r\n",
@@ -1109,6 +1109,25 @@
 							"    # Use mlflow.spark.log_model to log the model if you have a connected mlflow service\r\n",
 							"    mlflow.spark.log_model(lightgbm_model, \"lightgbm_model\")\r\n",
 							"\r\n",
+							"    mlflow.end_run()"
+						],
+						"outputs": [],
+						"execution_count": 160
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
 							"    # Use mlflow.pyfunc.load_model to load model back as PyFuncModel and apply predict\r\n",
 							"    model = mlflow.pyfunc.load_model(\"lightgbm_model\")\r\n",
 							"    prediction = model.predict(train_df_trans.toPandas())\r\n",
@@ -1129,26 +1148,6 @@
 							"    mlflow.log_metric('test_F1_Macro',f1_score(y_true,y_pred,average='macro'))\r\n",
 							"    mlflow.log_metric('test_Precision_Macro',precision_score(y_true,y_pred,average='macro'))\r\n",
 							"    mlflow.log_metric('test_Recall_Macro', recall_score(y_true,y_pred,average='macro'))\r\n",
-							"\r\n",
-							"    mlflow.end_run()"
-						],
-						"outputs": [],
-						"execution_count": 137
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
 							""
 						],
 						"outputs": [],
