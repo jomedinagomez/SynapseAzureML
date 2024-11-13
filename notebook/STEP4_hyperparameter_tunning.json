@@ -1,5 +1,5 @@
 {
-	"name": "STEP3_Model_predict",
+	"name": "STEP4_hyperparameter_tunning",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "add4f282-73cc-4a06-a3f2-29ccfdac3c4c"
+				"spark.autotune.trackingId": "c5e00fad-0b4b-46f7-8122-be5176c34da0"
 			}
 		},
 		"metadata": {
@@ -49,25 +49,6 @@
 		},
 		"cells": [
 			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"##https://github.com/microsoft/SynapseML/blob/master/docs/Use%20with%20MLFlow/Overview.md\r\n",
-					"##https://github.com/microsoft/SynapseML/blob/master/docs/Explore%20Algorithms/Hyperparameter%20Tuning/HyperOpt.ipynb"
-				],
-				"execution_count": 1
-			},
-			{
 				"cell_type": "markdown",
 				"metadata": {
 					"nteract": {
@@ -77,7 +58,7 @@
 					}
 				},
 				"source": [
-					"## 3. Model scoring"
+					"## 2. Model Training"
 				]
 			},
 			{
@@ -112,20 +93,7 @@
 					"from synapse.ml.lightgbm import *\r\n",
 					"from synapse.ml.train import ComputeModelStatistics"
 				],
-				"execution_count": 2
-			},
-			{
-				"cell_type": "markdown",
-				"metadata": {
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"### 3.1 Importing data"
-				]
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -148,6 +116,47 @@
 					"# Show contents of the dataframe\r\n",
 					"display(df.head(5))"
 				],
+				"execution_count": 2
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### 2.2 Split dataset in train/test using a stratified strategy"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"train_df = df.sampleBy(\"cost_class\", fractions={0: 0.7, 1: 0.7, 2: 0.7, 3: 0.7, 4: 0.7}, seed=10)\r\n",
+					"\r\n",
+					"print(\"----------------------------------------------------------------------\")\r\n",
+					"print(\"Printing count of train dataset\")\r\n",
+					"train_df.groupBy(\"cost_class\").count().show()\r\n",
+					"\r\n",
+					"test_df = df.subtract(train_df)\r\n",
+					"\r\n",
+					"print(\"----------------------------------------------------------------------\")\r\n",
+					"print(\"Printing count of test dataset\")\r\n",
+					"test_df.groupBy(\"cost_class\").count().show()"
+				],
 				"execution_count": 3
 			},
 			{
@@ -160,64 +169,8 @@
 					}
 				},
 				"source": [
-					"### 3.2  Testing model from run folder"
+					"### 1 - Setting up dependencies"
 				]
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"### --------------------------------------------------------------------------- ###\r\n",
-					"model_name = 'featurizer'\r\n",
-					"# Search registered models for the \r\n",
-					"for model in mlflow.search_registered_models():\r\n",
-					"    if model.name == model_name:\r\n",
-					"        latest_version_run_id = model.latest_versions[0].run_id\r\n",
-					"        model_found = True\r\n",
-					"        break\r\n",
-					"\r\n",
-					"# load model from Azure Machine Learning\r\n",
-					"run_id = latest_version_run_id\r\n",
-					"artifact_path = \"model\"\r\n",
-					"model_uri = f\"runs:/{run_id}/{artifact_path}\"\r\n",
-					"featurizer_model = mlflow.spark.load_model(model_uri)\r\n",
-					"\r\n",
-					"### --------------------------------------------------------------------------- ###\r\n",
-					"\r\n",
-					"model_name = 'classification_demo'\r\n",
-					"# Search registered models for the \r\n",
-					"for model in mlflow.search_registered_models():\r\n",
-					"    if model.name == model_name:\r\n",
-					"        latest_version_run_id = model.latest_versions[0].run_id\r\n",
-					"        model_found = True\r\n",
-					"        break\r\n",
-					"\r\n",
-					"# load model from Azure Machine Learning\r\n",
-					"run_id = latest_version_run_id\r\n",
-					"artifact_path = \"lightgbm_model\"\r\n",
-					"model_uri = f\"runs:/{run_id}/{artifact_path}\"\r\n",
-					"model = mlflow.pyfunc.load_model(model_uri)\r\n",
-					"\r\n",
-					"### --------------------------------------------------------------------------- ###\r\n",
-					"\r\n",
-					"df_trans = featurizer_model.transform(df)\r\n",
-					"pandas_df = df_trans.toPandas()\r\n",
-					"\r\n",
-					"# testing model\r\n",
-					"test_predictions = model.predict(pandas_df.head())\r\n",
-					"print(test_predictions)"
-				],
-				"execution_count": 4
 			},
 			{
 				"cell_type": "markdown",
@@ -229,7 +182,7 @@
 					}
 				},
 				"source": [
-					"### 3.3 Testing model from model registry using pyfunc"
+					"Define the models to be used."
 				]
 			},
 			{
@@ -246,12 +199,39 @@
 					}
 				},
 				"source": [
-					"model = mlflow.pyfunc.load_model(model_uri=f\"models:/classification_demo/latest\")\r\n",
-					"\r\n",
-					"test_predictions = model.predict(pandas_df)\r\n",
-					"print(test_predictions)"
+					"#https://spark.apache.org/docs/latest/api/python/_modules/pyspark/ml/classification.html"
 				],
-				"execution_count": 5
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from synapse.ml.automl import TuneHyperparameters\r\n",
+					"from synapse.ml.train import TrainClassifier\r\n",
+					"from pyspark.ml.classification import (\r\n",
+					"    LogisticRegression,\r\n",
+					"    RandomForestClassifier,\r\n",
+					"    GBTClassifier,\r\n",
+					")\r\n",
+					"\r\n",
+					"logReg = LogisticRegression()\r\n",
+					"randForest = RandomForestClassifier()\r\n",
+					"gbt = GBTClassifier()\r\n",
+					"smlmodels = [logReg, randForest]\r\n",
+					"mmlmodels = [TrainClassifier(model=model, labelCol=\"cost_class\") for model in smlmodels]"
+				],
+				"execution_count": 13
 			},
 			{
 				"cell_type": "markdown",
@@ -263,7 +243,21 @@
 					}
 				},
 				"source": [
-					"### 3.4 Testing model from model registry using spark"
+					"### 2 - Find the best model using AutoML\r\n",
+					""
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Import SynapseML's AutoML classes from `synapse.ml.automl`. Specify the hyperparameters using the `HyperparamBuilder`. Add either `DiscreteHyperParam` or `RangeHyperParam` hyperparameters. `TuneHyperparameters` will randomly choose values from a uniform distribution:"
 				]
 			},
 			{
@@ -277,14 +271,90 @@
 						"transient": {
 							"deleting": false
 						}
-					},
-					"collapsed": false
+					}
 				},
 				"source": [
-					"spark_model = mlflow.spark.load_model(model_uri=f\"models:/classification_demo/latest\")\r\n",
-					"display(spark_model.transform(df_trans))"
+					"from synapse.ml.automl import *\r\n",
+					"\r\n",
+					"paramBuilder = (\r\n",
+					"    HyperparamBuilder()\r\n",
+					"    .addHyperparam(logReg, logReg.regParam, RangeHyperParam(0.1, 0.3))\r\n",
+					"    .addHyperparam(randForest, randForest.numTrees, DiscreteHyperParam([5, 10]))\r\n",
+					"    .addHyperparam(randForest, randForest.maxDepth, DiscreteHyperParam([3, 5]))\r\n",
+					")\r\n",
+					"searchSpace = paramBuilder.build()\r\n",
+					"# The search space is a list of params to tuples of estimator and hyperparam\r\n",
+					"print(searchSpace)\r\n",
+					"randomSpace = RandomSpace(searchSpace)"
 				],
-				"execution_count": 6
+				"execution_count": 14
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"bestModel = TuneHyperparameters(\r\n",
+					"    evaluationMetric=\"accuracy\",\r\n",
+					"    models=mmlmodels,\r\n",
+					"    numFolds=5,\r\n",
+					"    numRuns=len(mmlmodels) * 5,\r\n",
+					"    parallelism=1,\r\n",
+					"    paramSpace=randomSpace.space(),\r\n",
+					"    seed=0,\r\n",
+					").fit(train_df)"
+				],
+				"execution_count": 19
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"print(bestModel.getBestModelInfo())\r\n",
+					"print(bestModel.getBestModel())"
+				],
+				"execution_count": 20
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from synapse.ml.train import ComputeModelStatistics\r\n",
+					"\r\n",
+					"prediction = bestModel.transform(test_df)\r\n",
+					"metrics = ComputeModelStatistics().transform(prediction)\r\n",
+					"metrics.limit(10).toPandas()"
+				],
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
