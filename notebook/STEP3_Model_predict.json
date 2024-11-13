@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "70e211f6-f048-43a1-940e-766f65e3afbd"
+				"spark.autotune.trackingId": "e3152cf6-2f62-4cb7-a0a4-a187b0340a30"
 			}
 		},
 		"metadata": {
@@ -62,9 +62,10 @@
 					}
 				},
 				"source": [
-					"##https://github.com/microsoft/SynapseML/blob/master/docs/Use%20with%20MLFlow/Overview.md"
+					"##https://github.com/microsoft/SynapseML/blob/master/docs/Use%20with%20MLFlow/Overview.md\r\n",
+					"##https://github.com/microsoft/SynapseML/blob/master/docs/Explore%20Algorithms/Hyperparameter%20Tuning/HyperOpt.ipynb"
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "markdown",
@@ -111,7 +112,7 @@
 					"from synapse.ml.lightgbm import *\r\n",
 					"from synapse.ml.train import ComputeModelStatistics"
 				],
-				"execution_count": 2
+				"execution_count": 7
 			},
 			{
 				"cell_type": "markdown",
@@ -147,7 +148,7 @@
 					"# Show contents of the dataframe\r\n",
 					"display(df.head(5))"
 				],
-				"execution_count": 3
+				"execution_count": 8
 			},
 			{
 				"cell_type": "markdown",
@@ -216,7 +217,7 @@
 					"test_predictions = model.predict(pandas_df.head())\r\n",
 					"print(test_predictions)"
 				],
-				"execution_count": 7
+				"execution_count": 9
 			},
 			{
 				"cell_type": "markdown",
@@ -250,7 +251,7 @@
 					"test_predictions = model.predict(pandas_df)\r\n",
 					"print(test_predictions)"
 				],
-				"execution_count": 11
+				"execution_count": 10
 			},
 			{
 				"cell_type": "markdown",
@@ -283,7 +284,7 @@
 					"spark_model = mlflow.spark.load_model(model_uri=f\"models:/classification_demo/latest\")\r\n",
 					"display(spark_model.transform(df_trans))"
 				],
-				"execution_count": 9
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
