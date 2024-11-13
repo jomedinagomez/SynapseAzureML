@@ -1386,7 +1386,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "9bfd961a-b556-4bc8-a7bc-3648821ec0d3"
+						"spark.autotune.trackingId": "add4f282-73cc-4a06-a3f2-29ccfdac3c4c"
 					}
 				},
 				"metadata": {
@@ -1411,8 +1411,7 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 10,
 						"cores": 8,
-						"memory": 56,
-						"automaticScaleJobs": false
+						"memory": 56
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1435,7 +1434,7 @@
 							"##https://github.com/microsoft/SynapseML/blob/master/docs/Explore%20Algorithms/Hyperparameter%20Tuning/HyperOpt.ipynb"
 						],
 						"outputs": [],
-						"execution_count": 6
+						"execution_count": 1
 					},
 					{
 						"cell_type": "markdown",
@@ -1452,7 +1451,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"# Importing pyspark dependencies\r\n",
 							"from pyspark.sql.types import IntegerType,BooleanType,DateType,NumericType,TimestampType\r\n",
@@ -1484,7 +1482,7 @@
 							"from synapse.ml.train import ComputeModelStatistics"
 						],
 						"outputs": [],
-						"execution_count": 7
+						"execution_count": 2
 					},
 					{
 						"cell_type": "markdown",
@@ -1521,7 +1519,7 @@
 							"display(df.head(5))"
 						],
 						"outputs": [],
-						"execution_count": 8
+						"execution_count": 3
 					},
 					{
 						"cell_type": "markdown",
@@ -1591,7 +1589,7 @@
 							"print(test_predictions)"
 						],
 						"outputs": [],
-						"execution_count": 9
+						"execution_count": 4
 					},
 					{
 						"cell_type": "markdown",
@@ -1626,7 +1624,7 @@
 							"print(test_predictions)"
 						],
 						"outputs": [],
-						"execution_count": 10
+						"execution_count": 5
 					},
 					{
 						"cell_type": "markdown",
@@ -1660,7 +1658,7 @@
 							"display(spark_model.transform(df_trans))"
 						],
 						"outputs": [],
-						"execution_count": 11
+						"execution_count": 6
 					},
 					{
 						"cell_type": "code",
@@ -1686,6 +1684,411 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/STEP4_hyperparameter_tunning')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "synapseml",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "7ab7c64d-515d-4dd2-a04e-81fdd5cbb47e"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/14585b9f-5c83-4a76-8055-42149123f99f/resourceGroups/SynapseMLrg/providers/Microsoft.Synapse/workspaces/synapsemlws/bigDataPools/synapseml",
+						"name": "synapseml",
+						"type": "Spark",
+						"endpoint": "https://synapsemlws.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/synapseml",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 10,
+						"cores": 8,
+						"memory": 56,
+						"automaticScaleJobs": false
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## 2. Model Training"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"# Importing pyspark dependencies\r\n",
+							"from pyspark.sql.types import IntegerType,BooleanType,DateType,NumericType,TimestampType\r\n",
+							"from pyspark.ml.feature import Binarizer, Bucketizer, QuantileDiscretizer\r\n",
+							"from com.microsoft.spark.sqlanalytics.Constants import Constants\r\n",
+							"import com.microsoft.spark.sqlanalytics\r\n",
+							"from pyspark.sql.functions import col\r\n",
+							"import pyspark.sql.functions as F\r\n",
+							"\r\n",
+							"# Importing mlflow libraries\r\n",
+							"from mlflow.models import infer_signature, set_signature\r\n",
+							"from mlflow.models.model import get_model_info\r\n",
+							"import mlflow\r\n",
+							"\r\n",
+							"\r\n",
+							"# Importing general libraries\r\n",
+							"from sklearn.metrics import accuracy_score, f1_score, precision_score, confusion_matrix, recall_score, roc_auc_score, classification_report\r\n",
+							"import pandas as pd\r\n",
+							"\r\n",
+							"#AML workspace authentication using linked service\r\n",
+							"from notebookutils.mssparkutils import azureML\r\n",
+							"linked_service_name = \"AzureMLService1\"\r\n",
+							"ws = azureML.getWorkspace(linked_service_name)\r\n",
+							"mlflow.set_tracking_uri(ws.get_mlflow_tracking_uri().replace(\"v2.0\",\"v1.0\"))\r\n",
+							"\r\n",
+							"## Importing SynapseML\r\n",
+							"from synapse.ml.featurize import Featurize\r\n",
+							"from synapse.ml.lightgbm import *\r\n",
+							"from synapse.ml.train import ComputeModelStatistics"
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"# Read from existing internal table\r\n",
+							"df = (spark.read.synapsesql(\"synapseazuremldedicates.dbo.class_transformed_taxi_data\")).drop('cost')\r\n",
+							"\r\n",
+							"# Show contents of the dataframe\r\n",
+							"display(df.head(5))"
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### 2.2 Split dataset in train/test using a stratified strategy"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"train_df = df.sampleBy(\"cost_class\", fractions={0: 0.7, 1: 0.7, 2: 0.7, 3: 0.7, 4: 0.7}, seed=10)\r\n",
+							"\r\n",
+							"print(\"----------------------------------------------------------------------\")\r\n",
+							"print(\"Printing count of train dataset\")\r\n",
+							"train_df.groupBy(\"cost_class\").count().show()\r\n",
+							"\r\n",
+							"test_df = df.subtract(train_df)\r\n",
+							"\r\n",
+							"print(\"----------------------------------------------------------------------\")\r\n",
+							"print(\"Printing count of test dataset\")\r\n",
+							"test_df.groupBy(\"cost_class\").count().show()"
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### 1 - Setting up dependencies"
+						]
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"Define the models to be used."
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#https://spark.apache.org/docs/latest/api/python/_modules/pyspark/ml/classification.html"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from synapse.ml.automl import TuneHyperparameters\r\n",
+							"from synapse.ml.train import TrainClassifier\r\n",
+							"from pyspark.ml.classification import (\r\n",
+							"    LogisticRegression,\r\n",
+							"    RandomForestClassifier,\r\n",
+							"    GBTClassifier,\r\n",
+							")\r\n",
+							"\r\n",
+							"logReg = LogisticRegression()\r\n",
+							"randForest = RandomForestClassifier()\r\n",
+							"gbt = GBTClassifier()\r\n",
+							"smlmodels = [logReg, randForest]\r\n",
+							"mmlmodels = [TrainClassifier(model=model, labelCol=\"cost_class\") for model in smlmodels]"
+						],
+						"outputs": [],
+						"execution_count": 13
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"### 2 - Find the best model using AutoML\r\n",
+							""
+						]
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"Import SynapseML's AutoML classes from `synapse.ml.automl`. Specify the hyperparameters using the `HyperparamBuilder`. Add either `DiscreteHyperParam` or `RangeHyperParam` hyperparameters. `TuneHyperparameters` will randomly choose values from a uniform distribution:"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from synapse.ml.automl import *\r\n",
+							"\r\n",
+							"paramBuilder = (\r\n",
+							"    HyperparamBuilder()\r\n",
+							"    .addHyperparam(logReg, logReg.regParam, RangeHyperParam(0.1, 0.3))\r\n",
+							"    .addHyperparam(randForest, randForest.numTrees, DiscreteHyperParam([5, 10]))\r\n",
+							"    .addHyperparam(randForest, randForest.maxDepth, DiscreteHyperParam([3, 5]))\r\n",
+							")\r\n",
+							"searchSpace = paramBuilder.build()\r\n",
+							"# The search space is a list of params to tuples of estimator and hyperparam\r\n",
+							"print(searchSpace)\r\n",
+							"randomSpace = RandomSpace(searchSpace)"
+						],
+						"outputs": [],
+						"execution_count": 14
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"bestModel = TuneHyperparameters(\r\n",
+							"    evaluationMetric=\"accuracy\",\r\n",
+							"    models=mmlmodels,\r\n",
+							"    numFolds=5,\r\n",
+							"    numRuns=len(mmlmodels) * 5,\r\n",
+							"    parallelism=1,\r\n",
+							"    paramSpace=randomSpace.space(),\r\n",
+							"    seed=0,\r\n",
+							").fit(train_df)"
+						],
+						"outputs": [],
+						"execution_count": 19
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"print(bestModel.getBestModelInfo())\r\n",
+							"print(bestModel.getBestModel())"
+						],
+						"outputs": [],
+						"execution_count": 20
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from synapse.ml.train import ComputeModelStatistics\r\n",
+							"\r\n",
+							"prediction = bestModel.transform(test_df)\r\n",
+							"metrics = ComputeModelStatistics().transform(prediction)\r\n",
+							"metrics.limit(10).toPandas()"
+						],
+						"outputs": [],
+						"execution_count": 21
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/synapseazuremldedicates')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "westus2"
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/synapseml')]",
 			"type": "Microsoft.Synapse/workspaces/bigDataPools",
 			"apiVersion": "2019-06-01-preview",
@@ -1705,18 +2108,6 @@
 				"sparkVersion": "3.4",
 				"isComputeIsolationEnabled": false,
 				"sessionLevelPackagesEnabled": false,
-				"annotations": []
-			},
-			"dependsOn": [],
-			"location": "westus2"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/synapseazuremldedicates')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"collation": "SQL_Latin1_General_CP1_CI_AS",
-				"maxSizeBytes": 263882790666240,
 				"annotations": []
 			},
 			"dependsOn": [],
